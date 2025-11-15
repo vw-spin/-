@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino</title>
+</head>
+<body>
+    <div>
+        <h1>Monitoramento de Linha Arduino</h1>
+        <button id="connectButton">Conectar Arduino</button>
+        <p>Status: <span id="status">Desconectado</span></p>
+    
+        <div id="dataDisplay">
+            <h2>Contagens</h2>
+            <p>Tacto 1: <span id="count_1">0</span></p>
+            <p>Tacto 6 (Produto Final): <span id="count_6">0</span></p>
+            
+            <h2>Alertas</h2>
+            <p>Retrabalho: <span id="status_retrab">OK</span></p>
+            <p>Parada de Linha: <span id="status_prob">OK</span></p>
+        </div>
+    </div>
+
+    <script src="js/arduino.js"></script>
+</body>
+</html>

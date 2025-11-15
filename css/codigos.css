@@ -1,0 +1,164 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+/* HEADER */
+header {
+  background-color: #003366;
+  color: white;
+  padding: 30px 0;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 2.5em;
+}
+
+.header-content {
+  display: block;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.tabelaCodigos {
+  background-color: rgb(127, 255, 238);
+  color: aqua;
+  padding: 30px;
+  margin-top: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  border: 3px solid black;
+  display: none;
+  width: 100px;
+}
+
+/* Tabela codigos-container */
+.tabela-codigos {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 30px 0;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tabela-codigos th, .tabela-codigos td {
+  padding: 10px 6px;
+  text-align: left;
+}
+.tabela-codigos thead {
+  background: #003366;
+  color: #fff;
+}
+.tabela-codigos tbody tr:nth-child(even) {
+  background: #f4f6f8;
+}
+.tabela-codigos tbody tr:hover {
+  background: #e0f7fa;
+}
+
+/* Bolinhas de etapas */
+.circulo-etapa {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid black;
+  display: inline-block;
+  margin: 0 5px;
+}
+
+.circulos-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.logo {
+  width: 130px;
+  height: auto;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6f8;
+  color: #333;
+}
+
+h1 {
+  text-align: center;
+  margin: 20px 0;
+  color: #003366;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #003366;
+  color: white;
+  margin-top: auto;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 700px) {
+  .circulo-etapa {
+    width: 30px;
+    height: 30px;
+    margin: 0 3px;
+  }
+  
+  .circulos-container {
+    gap: 5px;
+  }
+  
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  
+  thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  tr {
+    border: none;
+    margin-bottom: 14px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    display: block;
+  }
+  
+  td {
+    padding: 8px 0;
+    border: none;
+    position: relative;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  td:before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #0055a5;
+    font-size: 0.95rem;
+  }
+  
+  td[data-label="Progresso"] {
+    align-items: center;
+  }
+}

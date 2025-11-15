@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra de Produtos</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="icon" type="image/png" href="img/murilin2 (1).png">  
+</head>
+
+<header>
+    <div class="container header-content">
+        <img src="img/logo.png" alt="Logo Redim" class="logo">
+        <div>
+            <h3>VW - SPIN 2AP</h3>
+        </div>
+    </div>
+</header>
+
+<body>
+    
+
+ <main class="Compra">
+        <section class="compra">
+            <h2>Comprar produto</h2>
+          <form id="formCompra">
+    <input type="text" id="nomeUsuario" placeholder="Digite o seu nome" required>
+    <button type="submit" onclick="abrirPopup1()">Comprar</button>
+    <div id="resultadoCompra"></div>
+</form>
+<h3><div id="div1"></div></h3>
+<div id="div2"></div>
+        </section>
+
+    <div class="btn-centro">
+        <a href="rastreamento.html" class="btn"> Rastrear Produto </a>
+    </div>
+
+    <div class="overlay1" id="popup1">
+        <div class="popup1">
+          <h2>Limite Atingido! 😢</h2>
+          <p>Ops! O produto escolhido já obteve seu limite!</p>
+          <button onclick="fecharPopup1()">Fechar</button>
+        </div>
+      </div>
+
+    </main>
+
+
+    <script src="js/produto.js"></script>
+    <script type="module" src="FireBase/firebase-sync.js"></script>
+</body>
+
+<footer>
+    <p>&copy; 2025 Redim. Todos os direitos reservados a Matheus Ativo e Maki Yoshitake.</p>
+</footer>
+
+</html>

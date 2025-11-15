@@ -1,0 +1,424 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+}
+
+/* LAYOUT PRINCIPAL */
+.container,
+.Compra {
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+    flex: 1;
+}
+
+/* HEADER */
+header {
+    background-color: #003366;
+    color: white;
+    padding: 30px 0;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5em;
+}
+
+.header-content {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.logo {
+    width: 130px;
+    height: auto;
+}
+
+/* SEÇÃO COMPRA */
+.compra {
+    background-color: white;
+    padding: 30px;
+    margin-top: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.compra h2 {
+    color: #003366;
+    margin-bottom: 20px;
+}
+
+.compra div {
+    color: #0055a5;
+    margin-bottom: 20px;
+}
+
+/* DIVS DE RESULTADO */
+#div1 {
+    color: #0055a5;
+    margin-top: 10px;
+    display: none;
+}
+
+#div2 {
+    color: #333;
+    display: none;
+}
+
+/* SEÇÃO RASTREAMENTO */
+.rastreamento {
+    background-color: white;
+    padding: 30px;
+    margin-top: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.rastreamento h2 {
+    color: #003366;
+    margin-bottom: 20px;
+}
+
+/* FORMULÁRIOS */
+form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* BOTÕES */
+button,
+.btn {
+    padding: 12px 20px;
+    background-color: #0055a5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-centro {
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+#centro{
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    translate: (50%, 50%);
+}
+
+button:hover {
+    background-color: #003f7f;
+}
+
+/* ÍCONES */
+.lupa {
+    align-items: center;
+    height: 40px;
+    margin-right: 5px;
+}
+
+.carrinho {
+    transform: scaleX(-1);
+    align-items: center;
+    height: 43px;
+    margin-right: 5px;
+}
+
+.manopla {
+    align-items: center;
+    height: 45px;
+}
+
+/* RESULTADO */
+.resultado {
+    margin-top: 30px;
+    display: none;
+}
+
+.resultado h3 {
+    margin-bottom: 15px;
+    color: #0055a5;
+}
+
+#tabelaProcessos2 {
+    display: flex;
+    justify-content: center; 
+}
+
+.Tetapas{
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circulos-container {
+    display: flex;
+    gap: 10px; /* Distância entre os círculos */
+    justify-content: center; /* Alinha os círculos ao centro */
+    align-items: center; /* Garante que todos os círculos estejam na mesma linha */
+    width: 100%; /* Garante que a largura do container ocupe todo o espaço */
+}
+
+.circulo {
+    width: 50px;
+    /* Largura */
+    height: 50px;
+    /* Altura */
+    background-color: rgb(255, 255, 255);
+    /* Cor de fundo */
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 2px solid black;
+}
+
+/* TABELAS */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+}
+
+th,
+td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f4f8;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #003366;
+    color: white;
+    margin-top: auto;
+}
+
+/* -------------------- Responsividade para mobile -------------------- */
+@media (max-width: 700px) {
+    /* Form: coluna única */
+    form {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    input[type="text"] {
+        width: 100%;
+    }
+
+    button, .btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    /* Tornar tabela responsiva: cada linha vira um 'card' com label acima do valor */
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    /* Esconde cabeçalho tradicional em mobile */
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    /* Cada linha vira um card com sombra, borda arredondada e espaçamento maior */
+    tr {
+        border: none;
+        margin-bottom: 14px;
+        background: #fff;
+        border-radius: 10px;
+        padding: 14px;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+        display: block;
+    }
+
+    /* Cada célula é uma linha dentro do card; label exibida acima do valor para melhor legibilidade */
+    td {
+        padding: 8px 0;
+        border: none;
+        position: relative;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+    }
+
+    td:before {
+        content: attr(data-label);
+        display: block;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: #0055a5;
+        font-size: 0.95rem;
+    }
+
+    td span.value {
+        font-weight: 400;
+        color: #222;
+        font-size: 0.98rem;
+        line-height: 1.2;
+    }
+
+    /* No mobile alinhar como as outras células (à esquerda) */
+    td#tempo-estimado {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    td#tempo-estimado span.value {
+        align-self: flex-start;
+        text-align: left;
+        width: 100%;
+        padding-left: 0;
+        box-sizing: border-box;
+    }
+
+    /* Ajuste dos círculos de etapas: empilhamento e melhor espaçamento */
+    #tabelaProcessos2 {
+        display: block;
+        margin-top: 8px;
+    }
+
+    #tabelaProcessos2 thead tr {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #tabelaProcessos2 th {
+        display: block;
+        text-align: left;
+        padding: 10px 0;
+        border: none;
+        background: none;
+    }
+
+    .Tetapas {
+        height: auto;
+        padding: 6px 0;
+        text-align: left;
+        font-size: 0.95rem;
+    }
+
+    .circulos-container {
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .circulo {
+        width: 36px;
+        height: 36px;
+        border-width: 1.5px;
+    }
+
+    /* Melhor espaçamento para container principal */
+    .container {
+        width: 95%;
+        padding: 12px;
+    }
+}
+
+.overlay1 {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+}
+
+.overlay1.ativo {
+    display: flex;
+}
+
+.popup1 {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: aparecer 0.3s ease;
+}
+    
+@keyframes aparecer {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+*/
+
+.popup1 h2 {
+    margin-top: 0;
+}
+
+.popup1 button {
+    margin-top: 15px;
+    padding: 8px 12px;
+    border: none;
+    background: #007BFF;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.popup1 button:hover {
+    background: #0056b3;
+}

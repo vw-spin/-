@@ -1,0 +1,282 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+}
+
+h2 {
+    text-align: center;
+}
+
+/* HEADER */
+header {
+    background-color: #003366;
+    color: white;
+    padding: 30px 0;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5em;
+}
+
+.header-content {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.logo {
+    width: 130px;
+    height: auto;
+}
+
+/* CONTAINER PRINCIPAL */
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+    flex: 1;
+}
+
+.card-img-top {
+    width: 100%;
+    object-fit: cover;
+    height: 300px;
+    object-position: center;
+}
+
+.img {
+    width: 100%;
+    height: auto;
+}
+
+.img1, #Img3 {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    object-position: center;
+    padding-top: 0;
+}
+
+
+.product-card img,
+.product-item img,
+.card-img-top,
+.img,
+.img1,
+#Img3 {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.container .card .card-img-top,
+.row .card img,
+.card > img {
+    width: 100% !important;
+    height: 300px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+}
+
+.card-img-top.img-fluid {
+    width: 100% !important;
+    height: 300px !important;
+    max-height: 300px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+}
+
+@media (max-width: 700px) {
+    .card-img-top.img-fluid {
+        height: 180px !important;
+        max-height: 180px !important;
+    }
+}
+
+#img.card-img-top.img-fluid {
+    object-fit: contain !important;
+    padding: 12px !important;
+    background: white !important;
+}
+
+@media (max-width: 700px) {
+    #img.card-img-top.img-fluid {
+        height: 180px !important;
+        padding: 8px !important;
+    }
+}
+
+#Img2 {
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#Img2 img#img1 {
+    transform: scale(1.6);
+    transform-origin: center center;
+    display: block;
+}
+
+@media (max-width: 700px) {
+    #Img2 {
+        height: 180px;
+    }
+    #Img2 img#img1 {
+        transform: scale(1.4);
+    }
+}
+
+@media (max-width: 700px) {
+    .product-card img,
+    .product-item img,
+    .card-img-top,
+    .img,
+    .img1,
+    #Img3 {
+        height: 180px;
+    }
+}
+
+/* BOTÕES */
+button {
+    padding: 15px 30px;
+    font-size: 18px;
+    background-color: #0055a5;
+    color: white;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #003f7f;
+}
+
+.btn1 {
+    padding: 12px 20px;
+    background-color: #0055a5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-centro {
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-body .btn-centro {
+    margin-top: 16px;
+}
+
+/* ERRO */
+.erro-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex: 1 0 auto;
+}
+
+#telaErro {
+    display: none;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: rgb(255, 248, 157);
+    padding: 30px;
+    margin-top: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    max-width: 700px;
+}
+
+/* POPUP */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+}
+
+.overlay.ativo {
+    display: flex;
+}
+
+.popup {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: aparecer 0.3s ease;
+}
+
+@keyframes aparecer {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.popup h2 {
+    margin-top: 0;
+}
+
+.popup button {
+    margin-top: 15px;
+    padding: 8px 12px;
+    border: none;
+    background: #007BFF;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.popup button:hover {
+    background: #0056b3;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #003366;
+    color: white;
+    margin-top: auto;
+}
