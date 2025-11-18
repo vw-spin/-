@@ -6,7 +6,6 @@ var segundos;
 var operador;
 var currentDisplayedCodigo = '';
 
-// Define que o sistema tem 6 etapas
 window.DEFAULT_ETAPAS = 6;
 
 function formatTime(totalSeconds) {
@@ -18,11 +17,11 @@ function formatTime(totalSeconds) {
 
 function computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho) {
   const total = (typeof etapasTotal === 'number') ? etapasTotal : parseInt(etapasTotal, 10) || (window.DEFAULT_ETAPAS || 6);
-  const etapa = (typeof etapaAtual === 'number') ? etapaAtual : parseInt(etapaAtual, 10) || 1;
+  const etapa = (typeof etapaAtual === 'number') ? etapaAtual : parseInt(etapaAtual, 10) || 0;
 
   const secsArray = Array.isArray(window.SECS_PER_STAGE) ? window.SECS_PER_STAGE : null;
   if (secsArray && secsArray.length > 0) {
-    // Retorna diretamente os SEGUNDOS configurados
+  
     let baseTime = Number(secsArray[etapa] || 0);
     
     if (hasRetrabalho && etapa < 6) {
@@ -43,15 +42,14 @@ function computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho) {
 }
 
 if (!window.SECS_PER_STAGE) {
-  // Tempo em SEGUNDOS por etapa
-  window.SECS_PER_STAGE = [0, 35, 48, 40, 15, 20, 15, 0];
+  window.SECS_PER_STAGE = [0, 35, 48, 40, 15, 35, 12];
 }
 
 if (!window.RETRABALHO_MULTIPLIER) {
   window.RETRABALHO_MULTIPLIER = 1.0;
 }
 
-// Mapeamento de operador por etapa
+
 function operatorForStage(etapa) {
   switch (Number(etapa)) {
     case 1: return 'Maria Clara de Lima Rodrigues';
@@ -91,7 +89,7 @@ window.addEventListener && window.addEventListener('firebaseSync:codigos', funct
         tempo = Number(rec.tempo) || 0;
       } else {
         const etapasTotal = rec.etapasTotal || (window.DEFAULT_ETAPAS || 6);
-        const etapaAtual = rec.etapa || 1;
+        const etapaAtual = (rec.etapa !== undefined && rec.etapa !== null) ? rec.etapa : 0;
         tempo = computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho);
       }
       if (celulaTempo) {
@@ -130,7 +128,7 @@ function bindFormHandler() {
     const tabelaBody = document.querySelector('#tabelaProcessos tbody');
     tabelaBody.innerHTML = '';
 
-    var etapa = 1;
+    var etapa = 0;
     var sequenciamento;
     var hasRetrabalho = false;
 
@@ -172,8 +170,17 @@ function bindFormHandler() {
       }
       
       switch (etapa) {
-        case 1:
+        case 0:
           sequenciamento = "Compra registrada";
+          if (tempoFromDb !== null) tempo = tempoFromDb; 
+          else tempo = computeTempoSeconds(null, etapa, hasRetrabalho);
+          operador = operatorForStage(etapa);
+          resetarCirculos();
+          cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
+          break;
+
+        case 1:
+          sequenciamento = "Distribuição dos materiais em andamento";
           if (tempoFromDb !== null) tempo = tempoFromDb; 
           else tempo = computeTempoSeconds(null, etapa, hasRetrabalho);
           operador = operatorForStage(etapa);
@@ -228,7 +235,7 @@ function bindFormHandler() {
           break;
           
         case 6:
-          sequenciamento = "Montagem finalizada";
+          sequenciamento = "Colocação do produto na embalagems";
           operador = operatorForStage(etapa);
           resetarCirculos();
           cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
@@ -247,7 +254,6 @@ function bindFormHandler() {
           resetarCirculos();
       }
 
-      // Adiciona aviso de retrabalho se necessário
       if (hasRetrabalho && etapa < 6) {
         sequenciamento += " ⚠️ Retrabalho";
       }
@@ -263,7 +269,6 @@ function bindFormHandler() {
         span.className = 'value';
         span.textContent = text;
         
-        // Aplica cor de aviso se for retrabalho
         if (hasRetrabalho && etapa < 6 && (index === 1 || index === 3)) {
           span.style.color = '#d97706';
           span.style.fontWeight = 'bold';
@@ -351,34 +356,34 @@ function updateDisplayedCodigo() {
 
     let etapa = undefined;
     let hasRetrabalho = false;
-    
-    if (typeof coisas === 'object' && coisas[codigo] !== undefined) etapa = coisas[codigo];
-    else {
+
+    if (typeof coisas === 'object' && coisas[codigo] !== undefined) {
+      etapa = Number(coisas[codigo]);
+    } else {
       const found = (window.codigos || []).find(c => c.codigo === codigo);
-      if (found && found.etapa != null) etapa = found.etapa;
+      if (found && found.etapa != null) etapa = Number(found.etapa);
     }
 
-    // Verifica se há retrabalho
+    if (etapa === undefined || etapa === null || Number.isNaN(Number(etapa))) etapa = 0;
+
     if (map && map[codigo]) {
       hasRetrabalho = map[codigo].retrabalho || false;
     }
 
     let sequenciamento = 'Etapa desconhecida';
-    if (etapa) {
-      switch (etapa) {
-        case 1: sequenciamento = 'Compra registrada'; break;
-        case 2: sequenciamento = 'Montagem dos meios em andamento'; break;
-        case 3: sequenciamento = 'Montagem das quinas em andamento'; break;
-        case 4: sequenciamento = 'Testes de qualidade em andamento'; break;
-        case 5: sequenciamento = 'Ajuste dos parafusos e montagem das tampas em andamento'; break;
-        case 6: sequenciamento = 'Montagem finalizada'; break;
-        default: sequenciamento = 'Etapa desconhecida';
-      }
-      
-      // Adiciona aviso de retrabalho
-      if (hasRetrabalho && etapa < 6) {
-        sequenciamento += " ⚠️ ATENÇÃO: Problema inesperado detectado";
-      }
+    switch (Number(etapa)) {
+      case 0: sequenciamento = 'Compra registrada'; break;
+      case 1: sequenciamento = 'Distribuição dos materiais em andamento'; break;
+      case 2: sequenciamento = 'Montagem dos meios em andamento'; break;
+      case 3: sequenciamento = 'Montagem das quinas em andamento'; break;
+      case 4: sequenciamento = 'Testes de qualidade em andamento'; break;
+      case 5: sequenciamento = 'Ajuste dos parafusos e montagem das tampas em andamento'; break;
+      case 6: sequenciamento = 'Colocação do produto na embalagem'; break;
+      default: sequenciamento = 'Etapa desconhecida';
+    }
+
+    if (hasRetrabalho && etapa < 6) {
+      sequenciamento += " ⚠️ ATENÇÃO: Problema inesperado detectado";
     }
 
     if (etapaText) {
@@ -408,7 +413,7 @@ function updateDisplayedCodigo() {
       tempoVal = Number(tempos[codigo]);
     } else if (map && map[codigo] && map[codigo].tempo != null) {
       tempoVal = Number(map[codigo].tempo);
-    } else if (etapa) {
+    } else if (etapa !== undefined && etapa !== null) {
       tempoVal = computeTempoSeconds((map[codigo] && map[codigo].etapasTotal) || (window.DEFAULT_ETAPAS || 6), etapa, hasRetrabalho);
     }
 
@@ -429,7 +434,10 @@ function updateDisplayedCodigo() {
     }
 
     resetarCirculos();
-    switch (etapa) {
+    switch (Number(etapa)) {
+      case 0:
+        cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
+        break;
       case 1:
         cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
         break;
@@ -469,5 +477,4 @@ function updateDisplayedCodigo() {
   } catch (e) { console.warn('Erro ao atualizar display do código:', e); }
 }
 
-// Executa atualização periódica a cada 500ms
 setInterval(updateDisplayedCodigo, 500);

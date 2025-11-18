@@ -6,19 +6,41 @@ async function sincronizarContadorGlobal() {
         try {
             const valor = await window.getContadorGlobal();
             const contadorAtual = parseInt(valor, 10) || 0;
-            localStorage.setItem('contador', String(contadorAtual + 1));
+            localStorage.setItem('contador', String(contadorAtual));
             console.log(`✅ Contador sincronizado com Firebase: ${contadorAtual}`);
             return contadorAtual;
         } catch (err) {
             console.warn('⚠️ Falha ao sincronizar contador global:', err);
         }
     }
-    return parseInt(localStorage.getItem("contador")) || 1;
+    return parseInt(localStorage.getItem("contador")) || 0;
 }
 
-let conta = 1;
+let conta = 0;
+let contaAtual = parseInt(localStorage.getItem("contador")) || 0;
+
 (async () => {
     conta = await sincronizarContadorGlobal();
+ 
+    try {
+        const stored = parseInt(localStorage.getItem('contador'), 10);
+        contaAtual = isNaN(stored) ? (conta || 0) : stored;
+    } catch (e) { contaAtual = conta || 0; }
+0
+    try {
+        const localCodigos = JSON.parse(localStorage.getItem('codigos')) || [];
+        const localCoisas = JSON.parse(localStorage.getItem('coisas1')) || {};
+        const hasCodigos = (Array.isArray(localCodigos) && localCodigos.length > 0) || (localCoisas && Object.keys(localCoisas).length > 0);
+        if (!hasCodigos) {
+                try {
+                localStorage.setItem('coisas1', JSON.stringify({}));
+                localStorage.setItem('coisas', JSON.stringify({}));
+                localStorage.setItem('codigos', JSON.stringify([]));
+                localStorage.setItem('contador', String(0));
+                contaAtual = 0;
+            } catch (e) { /* ignore */ }
+        }
+    } catch (e) { /* ignore */ }
 })();
 
 
@@ -29,7 +51,7 @@ function fecharPopup1() {
     document.getElementById("popup1").style.display = "none";
 }
 
-var contaAtual = parseInt(localStorage.getItem("contador")) || 1;
+
 
 if (formCompra) {
     const numeros = document.getElementById('div1');
@@ -38,31 +60,39 @@ if (formCompra) {
     formCompra.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        //VERIFICAÇÃO DO LIMITE DE CÓDIGOS
         const limite = 6;
         const nome = document.getElementById('nomeUsuario').value;
 const resultadoDiv = document.getElementById('resultadoCompra');
 
-const contadorGlobal = await window.getContadorGlobal();
-const contaAtual = parseInt(contadorGlobal, 10) || 0;
+        let contaAtual = 0;
+        try {
+            if (window.getContadorGlobal && typeof window.getContadorGlobal === 'function') {
+                const contadorGlobal = await window.getContadorGlobal();
+                const parsed = parseInt(contadorGlobal, 10);
+                contaAtual = Number.isNaN(parsed) ? (parseInt(localStorage.getItem('contador'), 10) || 0) : parsed;
+            } else {
+                contaAtual = parseInt(localStorage.getItem('contador'), 10) || 0;
+            }
+        } catch (err) {
+            console.warn('Falha ao obter contadorGlobal, usando fallback local:', err);
+            contaAtual = parseInt(localStorage.getItem('contador'), 10) || 0;
+        }
 
-if (contaAtual >= limite) {
-
-
-            // Limpa a div de resultado e mostra a mensagem de erro
+        if (contaAtual >= limite) {
+            
             resultadoDiv.innerHTML = `<p style="color: red; font-weight: bold;">🚫 LIMITE ATINGIDO!</p>`;
             numeros.innerHTML = `Olá, ${nome}.`;
             numeros2.innerHTML = `O limite de **${limite} códigos** foi atingido.`;
-            div1.style.display = "block";
-            div1.style.backgroundColor = "white";
-            div2.style.display = "block";
-            div2.style.backgroundColor = 'white';
-            return; // Interrompe a execução para não gerar mais códigos
-        }else{
-            fecharPopup1()
+          
+            try { numeros.style.display = "block"; numeros.style.backgroundColor = "white"; } catch (e) {}
+            try { numeros2.style.display = "block"; numeros2.style.backgroundColor = 'white'; } catch (e) {}
+           
+            try { abrirPopup1(); } catch (e) { console.warn('Não foi possível abrir o popup:', e); }
+            return; 
+        } else {
+            fecharPopup1();
         }
-        
-        // mostra pro usuário (preparação da UI)
+
         resultadoDiv.innerHTML = "";
         numeros.innerHTML = `Muito Obrigado(a) ${nome}`;
         div1.style.display = "block";
@@ -74,10 +104,10 @@ if (contaAtual >= limite) {
         var wroteToFirebase = false;
         try {
             if (window.addCodigo && typeof window.addCodigo === 'function') {
-                // envie somente os dados relevantes; deixe o Firebase gerar o código sequencial
-                const payload = { nome, etapa: 1, createdAt: Date.now() };
+       
+                const payload = { nome, etapa: 0, createdAt: Date.now() };
                 const generated = await window.addCodigo(payload);
-                // addCodigo retorna a string do código gerado (ex: "0001")
+     
                 if (generated) {
                     codigo = String(generated).padStart(4, '0');
                     wroteToFirebase = true;
@@ -89,10 +119,10 @@ if (contaAtual >= limite) {
         }
 
         if (wroteToFirebase) {
-            // usa o código gerado pelo Firebase para mostrar ao usuário e atualizar localStorage
+         
             numeros2.innerHTML = `<strong>O seu código é: ${codigo}</strong>`;
             try {
-                // atualiza lista de codigos local para UI/backup
+        
                 var codigos = JSON.parse(localStorage.getItem("codigos")) || [];
                 if (contaAtual <= limite) {
                     setTimeout(function() {
@@ -104,44 +134,49 @@ if (contaAtual >= limite) {
             } catch (e) { console.warn('Falha ao atualizar localStorage codigos:', e); }
 
             try {
-                // atualiza coisas1 local (objeto mapeado por código)
+       
                 let stored = JSON.parse(localStorage.getItem("coisas1")) || {};
                 if (Array.isArray(stored)) {
-                    // converte array para objeto mantendo compatibilidade mínima
+            
                     const obj = {};
                     stored.forEach((v, i) => { obj[String(i + 1).padStart(4, '0')] = v; });
                     stored = obj;
                 }
-                stored[codigo] = 1;
+              
+                stored[codigo] = 0;
                 localStorage.setItem("coisas1", JSON.stringify(stored));
+                try { localStorage.setItem("coisas", JSON.stringify(stored)); } catch (e) {}
             } catch (e) { console.warn('Falha ao atualizar localStorage coisas1:', e); }
 
-            // sincroniza contador local para evitar gerar o mesmo número localmente quando offline
-            try {
-                const nextNum = parseInt(codigo, 10) + 1;
-                if (!isNaN(nextNum)) localStorage.setItem('contador', String(nextNum));
-            } catch (e) {}
+            
         } else {
-            let contaLocal = contaAtual;
-            codigo = contaLocal.toString().padStart(4, '0');
-            contaLocal++; // Prepara o contador para o próximo
-            numeros2.innerHTML = `<strong>O seu código é: ${codigo}</strong>`;
+           
+            try {
+                let localCont = parseInt(localStorage.getItem('contador'), 10);
+                if (isNaN(localCont)) localCont = 0;
+                localCont = localCont + 1; 
+                codigo = String(localCont).padStart(4, '0');
 
-            var codigos = JSON.parse(localStorage.getItem("codigos")) || [];
-            codigos.push({ codigo, nome });
-            localStorage.setItem("codigos", JSON.stringify(codigos));
+                numeros2.innerHTML = `<strong>O seu código é: ${codigo}</strong>`;
 
-            // atualiza coisas1 local como array ou objeto
-            let stored = JSON.parse(localStorage.getItem("coisas1"));
-            if (!stored) stored = [];
-            if (Array.isArray(stored)) {
-                stored.push(1);
-            } else if (typeof stored === 'object') {
-                stored[codigo] = 1;
+                var codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+                codigos.push({ codigo, nome });
+                localStorage.setItem("codigos", JSON.stringify(codigos));
+
+                let stored = JSON.parse(localStorage.getItem("coisas1")) || {};
+                if (Array.isArray(stored)) {
+                    const obj = {};
+                    stored.forEach((v, i) => { obj[String(i + 1).padStart(4, '0')] = v; });
+                    stored = obj;
+                }
+                stored[codigo] = 0;
+                localStorage.setItem("coisas1", JSON.stringify(stored));
+                try { localStorage.setItem("coisas", JSON.stringify(stored)); } catch (e) {}
+
+                localStorage.setItem("contador", String(localCont));
+            } catch (e) {
+                console.warn('Falha no fallback local ao gerar código:', e);
             }
-            localStorage.setItem("coisas1", JSON.stringify(stored));
-
-            localStorage.setItem("contador", contaLocal); // Salva o contador incrementado
         }
 
         console.log("Códigos salvos:", codigo);

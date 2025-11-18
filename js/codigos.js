@@ -3,7 +3,7 @@ var nomeCodigos = document.getElementById('codigos-container');
 setInterval(atualizadorNomeCodigos, 1000);
 
 function atualizadorNomeCodigos() {
-    // Pega os códigos do Firebase ou localStorage
+   
     var codigos = (window.codigos && Array.isArray(window.codigos) && window.codigos.length > 0) 
         ? window.codigos 
         : (JSON.parse(localStorage.getItem("codigos")) || []);
@@ -17,15 +17,15 @@ function atualizadorNomeCodigos() {
         let tabela = `<table class="tabela-codigos">
             <thead>
                 <tr>
-                    <th>Nome</th>
-                    <th>Código</th>
-                    <th style="text-align: center;">Progresso das Etapas</th>
+                  <th style="padding: 30px;font-size: 18px;">Nome</th>
+                    <th style="font-size: 18px;">Código</th>
+                    <th style="text-align: center;font-size: 18px;">Progresso das Etapas</th>
                 </tr>
             </thead>
             <tbody>
                 ${codigos.map(item => {
                    
-                    const etapaAtual = coisas1[item.codigo] || 1;
+                    const etapaAtual = coisas1[item.codigo] || 0;
                     
                     // Verifica se tem retrabalho ativo
                     const temRetrabalho = (window.codigosMap && 
@@ -46,21 +46,22 @@ function atualizadorNomeCodigos() {
                     
                     let nomeEtapa = '';
                     switch(etapaAtual) {
-                        case 1: nomeEtapa = 'Compra registrada'; break;
+                        case 0: nomeEtapa = 'Compra registrada'; break;
+                        case 1: nomeEtapa = 'Distribuição dos materiais em andamento'; break;
                         case 2: nomeEtapa = 'Montagem dos meios'; break;
                         case 3: nomeEtapa = 'Montagem das quinas'; break;
                         case 4: nomeEtapa = 'Testes de qualidade'; break;
                         case 5: nomeEtapa = 'Montagem das tampas'; break;
-                        case 6: nomeEtapa = 'Finalizado ✓'; break;
+                        case 6: nomeEtapa = 'Colocação do produto na embalagem'; break;
                         default: nomeEtapa = 'Etapa desconhecida';
                     }
                     
                     return `
                     <tr>
-                        <td data-label="Nome">${item.nome}</td>
-                        <td data-label="Código">${item.codigo}</td>
-                        <td data-label="Progresso" style="text-align: center;">
-                            <div style="margin-bottom: 8px;">
+                       <td data-label="Nome" style="padding: 30px;; font-size: 18px">${item.nome}</td>
+                        <td data-label="Código" style="font-size: 18px;">${item.codigo}</td>
+                        <td data-label="Progresso" style="text-align: center;font-size: 18px;">
+                            <div style="margin-bottom: 8px;font-size: 18px;">
                                 <strong>${nomeEtapa}</strong>
                             </div>
                             <div class="circulos-container" style="justify-content: center;">

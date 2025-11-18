@@ -32,7 +32,7 @@ if (window.__firebaseSyncInitialized) {
       }
       if (!window.SECS_PER_STAGE) {
         // Tempo em SEGUNDOS por etapa
-        window.SECS_PER_STAGE = [0, 35, 48, 40, 15, 20, 15, 0];
+        window.SECS_PER_STAGE = [0, 35, 48, 40, 15, 20, 15, 12];
       }
 
       if (!window.RETRABALHO_MULTIPLIER) {
@@ -46,7 +46,7 @@ if (window.__firebaseSyncInitialized) {
 
       function computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho) {
         const total = (typeof etapasTotal === 'number') ? etapasTotal : parseInt(etapasTotal, 10) || (window.DEFAULT_ETAPAS || 6);
-        const etapa = (typeof etapaAtual === 'number') ? etapaAtual : parseInt(etapaAtual, 10) || 1;
+        const etapa = (typeof etapaAtual === 'number') ? etapaAtual : parseInt(etapaAtual, 10) || 0;
 
         const secsArray = Array.isArray(window.SECS_PER_STAGE) ? window.SECS_PER_STAGE : null;
         if (secsArray && secsArray.length > 0) {
@@ -92,8 +92,12 @@ if (window.__firebaseSyncInitialized) {
           try {
             const val = snap.val() || {};
             window.coisas1 = val;
+            // Backwards-compat: também expose como `coisas` e salve em localStorage 'coisas'
+            try { window.coisas = val; } catch (e) {}
             try { localStorage.setItem('coisas1', JSON.stringify(val)); } catch (e) { console.warn('Falha ao gravar localStorage coisas1:', e); }
+            try { localStorage.setItem('coisas', JSON.stringify(val)); } catch (e) { /* ignore */ }
             try { window.dispatchEvent(new CustomEvent('firebaseSync:coisas1', { detail: { map: val } })); } catch (e) {}
+            try { window.dispatchEvent(new CustomEvent('firebaseSync:coisas', { detail: { map: val } })); } catch (e) {}
           } catch (e) { console.warn('Erro no listener coisas1:', e); }
         });
       } catch (e) { console.warn('Erro ao registrar listener coisas1:', e); }
@@ -115,21 +119,22 @@ if (window.__firebaseSyncInitialized) {
 
           const contadorRef = dbRef('contadorGlobal');
 
-          const snapAtual = await get(contadorRef);
-          const valorAtual = snapAtual.exists() ? snapAtual.val() : 0;
+            const snapAtual = await get(contadorRef);
+            const valorAtual = snapAtual.exists() ? snapAtual.val() : 0;
           const limite = 6;
           if (valorAtual >= limite) {
               throw new Error(`Limite de ${limite} códigos atingido!`);
           }
-          
-          let codigoNum = await runTransaction(contadorRef, (currentValue) => {
+            // Incrementa o contador no servidor de forma atômica (primeiro código será 0001)
+            let codigoNum = await runTransaction(contadorRef, (currentValue) => {
               return (currentValue || 0) + 1;
-          }).then(result => result.snapshot.val());
+            }).then(result => result.snapshot.val());
           
 
           const codigoStr = codigoNum.toString().padStart(4, '0');
 
-          const etapaInicial = codigoObj.etapa || 1;
+          // Por padrão, a etapa inicial deve ser 0 (tacto inicia em 0)
+          const etapaInicial = (codigoObj && codigoObj.etapa !== undefined) ? codigoObj.etapa : 0;
           const etapasTotal = (codigoObj.etapasTotal || window.DEFAULT_ETAPAS || 6);
           const payload = {
             nome: codigoObj.nome || null,
@@ -179,7 +184,7 @@ if (window.__firebaseSyncInitialized) {
           
           const current = snap.val();
           const etapasTotal = current.etapasTotal || (window.DEFAULT_ETAPAS || 6);
-          const etapaAtual = current.etapa || 1;
+          const etapaAtual = (current && current.etapa !== undefined && current.etapa !== null) ? current.etapa : 0;
           
           const novoTempo = computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho);
           
@@ -206,9 +211,11 @@ if (window.__firebaseSyncInitialized) {
 
       if (!window.resetCodigos) {
         window.resetCodigos = async function () {
+          // Remove códigos e tempos, inicializa coisas1 vazio e contadorGlobal como 0
           await set(dbRef('codigos'), null);
-          await set(dbRef('coisas1'), null);
-          await set(dbRef('tempos'), null); 
+          await set(dbRef('coisas1'), {});
+          await set(dbRef('tempos'), null);
+          // Define contadorGlobal como 0 — admin deve alterar quando quiser avançar
           await set(dbRef('contadorGlobal'), 0);
         };
       }
@@ -245,7 +252,7 @@ if (window.__firebaseSyncInitialized) {
       }
 
       window.__firebaseSyncInitialized = true;
-      console.log('firebase-sync initialized: 6 etapas, tempos em SEGUNDOS [0,35,48,40,15,20,15,0]');
+      console.log('firebase-sync initialized: 6 etapas, tempos em SEGUNDOS [0,35,48,40,15,20,15,12]');
 
     } catch (e) {
       console.warn('firebase-sync internal error:', e);

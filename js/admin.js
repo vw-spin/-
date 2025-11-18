@@ -15,7 +15,7 @@ var EtapasAdmin1 = document.getElementById('EtapasAdmin');
 window.DEFAULT_ETAPAS = 6;
 
 var QetapaÉ = '';
-var conta = parseInt(localStorage.getItem("contador")) || 1;
+var conta = parseInt(localStorage.getItem("contador")) || 0;
 
 retrabalho = 0; // etapa destinada ao retrabalho 
 corB = 0; // define a cor do botão
@@ -76,12 +76,12 @@ function b5() {
 }
 
 function b8() {
-    etapa1 = 1;
+    etapa1 = 0;
     resetador();
 }
 
 function resetador() {
-    B1.style.backgroundColor = 'yellow';
+    B1.style.backgroundColor = 'white';
     B2.style.backgroundColor = 'white';
     B3.style.backgroundColor = 'white';
     B4.style.backgroundColor = 'white';
@@ -220,7 +220,8 @@ function b10() {
     (async () => {
         try {
             if (window.addCodigo && typeof window.addCodigo === 'function') {
-                const payload = { nome, etapa: 1, createdAt: Date.now() };
+                // etapa inicia em 0 (tacto = 0)
+                const payload = { nome, etapa: 0, createdAt: Date.now() };
                 const generated = await window.addCodigo(payload);
                 const codigoStr = String(generated).padStart(4, '0');
                 
@@ -240,11 +241,10 @@ function b10() {
                 }
                 localStorage.setItem("coisas1", JSON.stringify(stored));
 
-                try { localStorage.setItem('contador', String(parseInt(codigoStr, 10) + 1)); } catch (e) {}
                 console.log("Códigos salvos (firebase):", codigoStr, nome);
             } else {
                 var codigo = conta.toString().padStart(4, '0');
-                conta++;
+               
                 var codigos = JSON.parse(localStorage.getItem("codigos")) || [];
                 codigos.push({ codigo, nome });
                 localStorage.setItem("codigos", JSON.stringify(codigos));
@@ -256,7 +256,7 @@ function b10() {
                     arr[codigo] = 1;
                 }
                 localStorage.setItem("coisas1", JSON.stringify(arr));
-                localStorage.setItem("contador", conta);
+                
                 console.log("Códigos salvos (fallback):", codigo, nome);
             }
         } catch (e) {
@@ -292,8 +292,11 @@ function b11() {
     var sequenciamento = "";
 
     switch (etapaAtual) {
-        case 1:
+        case 0:
             sequenciamento = "Compra registrada";
+            break;
+        case 1:
+            sequenciamento = "Distribuição dos materiais em andamento";
             break;
         case 2:
             sequenciamento = "Montagem dos meios em andamento";
@@ -308,7 +311,7 @@ function b11() {
             sequenciamento = "Ajuste dos parafusos e montagem das tampas em andamento";
             break;
         case 6:
-            sequenciamento = "Montagem finalizada";
+            sequenciamento = "Colocação do produto na embalagem";
             break;
         default:
             sequenciamento = "Etapa desconhecida";
@@ -385,9 +388,10 @@ if (reset) {
             }
         } catch (e) { console.warn(e); }
         
-        localStorage.removeItem("coisas1");
-        localStorage.removeItem("codigos");
-        localStorage.removeItem("contador");
+        localStorage.setItem("coisas1", JSON.stringify({}));
+        try { localStorage.setItem("coisas", JSON.stringify({})); } catch (e) {}
+        localStorage.setItem("codigos", JSON.stringify([]));
+        localStorage.setItem("contador", String(0));
         
         window.tempo = 0;
         
