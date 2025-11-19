@@ -8,6 +8,16 @@ var currentDisplayedCodigo = '';
 
 window.DEFAULT_ETAPAS = 6;
 
+// Tempos ajustados conforme a tabela (ordem: 35+48+40+15+35+12 = 185s total)
+// Índice 0 = inicial, 1-6 = etapas 1-6
+if (!window.SECS_PER_STAGE) {
+  window.SECS_PER_STAGE = [0, 35, 48, 40, 15, 35, 12];
+}
+
+if (!window.RETRABALHO_MULTIPLIER) {
+  window.RETRABALHO_MULTIPLIER = 1.0;
+}
+
 function formatTime(totalSeconds) {
   const s = Math.max(0, Math.floor(totalSeconds));
   const m = Math.floor(s / 60);
@@ -15,23 +25,30 @@ function formatTime(totalSeconds) {
   return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 }
 
+// Função atualizada: calcula tempo baseado na SOMA das etapas restantes
 function computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho) {
   const total = (typeof etapasTotal === 'number') ? etapasTotal : parseInt(etapasTotal, 10) || (window.DEFAULT_ETAPAS || 6);
   const etapa = (typeof etapaAtual === 'number') ? etapaAtual : parseInt(etapaAtual, 10) || 0;
 
   const secsArray = Array.isArray(window.SECS_PER_STAGE) ? window.SECS_PER_STAGE : null;
-  if (secsArray && secsArray.length > 0) {
   
-    let baseTime = Number(secsArray[etapa] || 0);
-    
-    if (hasRetrabalho && etapa < 6) {
-      baseTime = Math.floor(baseTime * (window.RETRABALHO_MULTIPLIER || 1.0));
+  if (secsArray && secsArray.length > 0) {
+    // Soma a etapa atual + todas as etapas restantes
+    let totalTime = 0;
+    for (let i = etapa; i <= 6; i++) {
+      totalTime += Number(secsArray[i] || 0);
     }
     
-    return baseTime;
+    // Aplica multiplicador de retrabalho se necessário
+    if (hasRetrabalho && etapa < 6) {
+      totalTime = Math.floor(totalTime * (window.RETRABALHO_MULTIPLIER || 1.0));
+    }
+    
+    return totalTime;
   }
 
-  const remainingStages = Math.max(0, total - etapa + 1);
+  // Fallback caso não tenha SECS_PER_STAGE
+  const remainingStages = Math.max(0, total - etapa);
   let baseTime = remainingStages * 60;
   
   if (hasRetrabalho && etapa < 6) {
@@ -41,17 +58,9 @@ function computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho) {
   return baseTime;
 }
 
-if (!window.SECS_PER_STAGE) {
-  window.SECS_PER_STAGE = [0, 35, 48, 40, 15, 35, 12];
-}
-
-if (!window.RETRABALHO_MULTIPLIER) {
-  window.RETRABALHO_MULTIPLIER = 1.0;
-}
-
-
 function operatorForStage(etapa) {
   switch (Number(etapa)) {
+    case 0: return 'Maria Clara de Lima Rodrigues';
     case 1: return 'Maria Clara de Lima Rodrigues';
     case 2: return 'Matheus Gabriel Mendes Villa';
     case 3: return 'Maki Yoshitake Rocha';
@@ -84,14 +93,12 @@ window.addEventListener && window.addEventListener('firebaseSync:codigos', funct
     if (map && map[codigoAtual]) {
       const rec = map[codigoAtual];
       const hasRetrabalho = rec.retrabalho || false;
+      const etapasTotal = rec.etapasTotal || (window.DEFAULT_ETAPAS || 6);
+      const etapaAtual = (rec.etapa !== undefined && rec.etapa !== null) ? rec.etapa : 0;
       
-      if (rec.tempo != null) {
-        tempo = Number(rec.tempo) || 0;
-      } else {
-        const etapasTotal = rec.etapasTotal || (window.DEFAULT_ETAPAS || 6);
-        const etapaAtual = (rec.etapa !== undefined && rec.etapa !== null) ? rec.etapa : 0;
-        tempo = computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho);
-      }
+      // Sempre calcula baseado na etapa atual
+      tempo = computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho);
+      
       if (celulaTempo) {
         const tempoTexto = formatTime(tempo);
         celulaTempo.querySelector('.value').textContent = tempoTexto;
@@ -159,30 +166,19 @@ function bindFormHandler() {
       }
       console.log('Etapa:', etapa, 'Retrabalho:', hasRetrabalho);
 
-      var tempoFromDb = null;
-      if (window.codigosMap && window.codigosMap[codigo]) {
-        const rec = window.codigosMap[codigo];
-        if (rec.tempo != null) {
-          tempoFromDb = Number(rec.tempo) || 0;
-        } else if (rec.etapasTotal != null) {
-          tempoFromDb = computeTempoSeconds(rec.etapasTotal, etapa, hasRetrabalho);
-        }
-      }
+      // Sempre calcula tempo baseado na etapa
+      tempo = computeTempoSeconds(null, etapa, hasRetrabalho);
       
       switch (etapa) {
         case 0:
           sequenciamento = "Compra registrada";
-          if (tempoFromDb !== null) tempo = tempoFromDb; 
-          else tempo = computeTempoSeconds(null, etapa, hasRetrabalho);
           operador = operatorForStage(etapa);
           resetarCirculos();
-          cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
+          // Etapa 0: todas as bolinhas ficam brancas
           break;
 
         case 1:
           sequenciamento = "Distribuição dos materiais em andamento";
-          if (tempoFromDb !== null) tempo = tempoFromDb; 
-          else tempo = computeTempoSeconds(null, etapa, hasRetrabalho);
           operador = operatorForStage(etapa);
           resetarCirculos();
           cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
@@ -190,8 +186,6 @@ function bindFormHandler() {
           
         case 2:
           sequenciamento = "Montagem dos meios em andamento";
-          if (tempoFromDb !== null) tempo = tempoFromDb; 
-          else tempo = computeTempoSeconds(null, etapa, hasRetrabalho);
           operador = operatorForStage(etapa);
           resetarCirculos();
           cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
@@ -200,8 +194,6 @@ function bindFormHandler() {
           
         case 3:
           sequenciamento = "Montagem das quinas em andamento";
-          if (tempoFromDb !== null) tempo = tempoFromDb; 
-          else tempo = computeTempoSeconds(null, etapa, hasRetrabalho);
           operador = operatorForStage(etapa);
           resetarCirculos();
           cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
@@ -211,8 +203,6 @@ function bindFormHandler() {
           
         case 4:
           sequenciamento = "Testes de qualidade em andamento";
-          if (tempoFromDb !== null) tempo = tempoFromDb; 
-          else tempo = computeTempoSeconds(null, etapa, hasRetrabalho);
           operador = operatorForStage(etapa);
           resetarCirculos();
           cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
@@ -223,8 +213,6 @@ function bindFormHandler() {
           
         case 5:
           sequenciamento = "Ajuste dos parafusos e montagem das tampas em andamento";
-          if (tempoFromDb !== null) tempo = tempoFromDb; 
-          else tempo = computeTempoSeconds(null, etapa, hasRetrabalho);
           operador = operatorForStage(etapa);
           resetarCirculos();
           cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
@@ -235,7 +223,7 @@ function bindFormHandler() {
           break;
           
         case 6:
-          sequenciamento = "Colocação do produto na embalagems";
+          sequenciamento = "Colocação do produto na embalagem";
           operador = operatorForStage(etapa);
           resetarCirculos();
           cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
@@ -349,7 +337,6 @@ function updateDisplayedCodigo() {
     const tempoCell = document.getElementById('tempo-estimado');
 
     const map = window.codigosMap || {};
-    const tempos = window.temposMap || {};
     const coisas = window.coisas1 || {};
 
     if (codigoCell) codigoCell.querySelector('.value').textContent = codigo;
@@ -408,14 +395,8 @@ function updateDisplayedCodigo() {
     }
     if (operadorCell) operadorCell.querySelector('.value').textContent = operadorNome;
 
-    let tempoVal = null;
-    if (tempos && tempos[codigo] != null) {
-      tempoVal = Number(tempos[codigo]);
-    } else if (map && map[codigo] && map[codigo].tempo != null) {
-      tempoVal = Number(map[codigo].tempo);
-    } else if (etapa !== undefined && etapa !== null) {
-      tempoVal = computeTempoSeconds((map[codigo] && map[codigo].etapasTotal) || (window.DEFAULT_ETAPAS || 6), etapa, hasRetrabalho);
-    }
+    // Sempre calcula tempo baseado na etapa atual
+    const tempoVal = computeTempoSeconds((map[codigo] && map[codigo].etapasTotal) || (window.DEFAULT_ETAPAS || 6), etapa, hasRetrabalho);
 
     if (tempoVal != null) {
       tempo = tempoVal;
@@ -436,7 +417,7 @@ function updateDisplayedCodigo() {
     resetarCirculos();
     switch (Number(etapa)) {
       case 0:
-        cEtapa1 && (cEtapa1.style.backgroundColor = 'green');
+        // Etapa 0: todas as bolinhas brancas (nenhuma verde)
         break;
       case 1:
         cEtapa1 && (cEtapa1.style.backgroundColor = 'green');

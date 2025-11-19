@@ -3,13 +3,10 @@ if (window.__firebaseSyncInitialized) {
 } else {
   (async () => {
     try {
-      // **1. Atualizar a URL do SDK para 12.4.0**
       const { initializeApp } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js');
-      // **2. Atualizar a URL do Database SDK para 12.4.0**
       const dbModule = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js');
       const { getDatabase, ref, onValue, set, update, get, remove, runTransaction } = dbModule;
 
-      // **3. NOVA CONFIGURAÇÃO DO FIREBASE**
       const firebaseConfig = {
         apiKey: "AIzaSyA1To6Eyx1iNvUIiST2LulmXWzDVl252w4",
         authDomain: "teste-004-c3dcf.firebaseapp.com",
@@ -18,7 +15,7 @@ if (window.__firebaseSyncInitialized) {
         storageBucket: "teste-004-c3dcf.firebasestorage.app",
         messagingSenderId: "829672601958",
         appId: "1:829672601958:web:ff6cbd97f45a4d50eff0a7",
-        measurementId: "G-DXBRNTD5LT" // Manter ou atualizar para o novo ID
+        measurementId: "G-DXBRNTD5LT"
       };
 
       const app = initializeApp(firebaseConfig);
@@ -26,13 +23,13 @@ if (window.__firebaseSyncInitialized) {
 
       function dbRef(path) { return ref(db, path); }
 
-      // Define 6 etapas no sistema
       if (!window.DEFAULT_ETAPAS) {
         window.DEFAULT_ETAPAS = 6;
       }
+      
+      // Tempos ajustados conforme tabela (Etapa 5 agora é 35s = 20s + 15s)
       if (!window.SECS_PER_STAGE) {
-        // Tempo em SEGUNDOS por etapa
-        window.SECS_PER_STAGE = [0, 35, 48, 40, 15, 20, 15, 12];
+        window.SECS_PER_STAGE = [0, 35, 48, 40, 15, 35, 12];
       }
 
       if (!window.RETRABALHO_MULTIPLIER) {
@@ -44,19 +41,20 @@ if (window.__firebaseSyncInitialized) {
         return Object.keys(obj).map(k => ({ codigo: k, ...obj[k] }));
       }
 
+      // Função atualizada: calcula tempo baseado na SOMA das etapas restantes
       function computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho) {
         const total = (typeof etapasTotal === 'number') ? etapasTotal : parseInt(etapasTotal, 10) || (window.DEFAULT_ETAPAS || 6);
         const etapa = (typeof etapaAtual === 'number') ? etapaAtual : parseInt(etapaAtual, 10) || 0;
 
         const secsArray = Array.isArray(window.SECS_PER_STAGE) ? window.SECS_PER_STAGE : null;
         if (secsArray && secsArray.length > 0) {
-         
+          // Soma todas as etapas RESTANTES (da próxima até a última)
           let totalTime = 0;
-          for (let i = etapa; i <= 5; i++) {
+          for (let i = etapa + 1; i <= 6; i++) {
             totalTime += Number(secsArray[i] || 0);
           }
           
-          // Retrabalho
+          // Aplica multiplicador de retrabalho se necessário
           if (hasRetrabalho && etapa < 6) {
             totalTime = Math.floor(totalTime * (window.RETRABALHO_MULTIPLIER || 1.0));
           }
@@ -64,7 +62,8 @@ if (window.__firebaseSyncInitialized) {
           return totalTime;
         }
 
-        const remainingStages = Math.max(0, total - etapa + 1);
+        // Fallback
+        const remainingStages = Math.max(0, total - etapa);
         let baseTime = remainingStages * 60;
         
         if (hasRetrabalho && etapa < 6) {
@@ -92,7 +91,6 @@ if (window.__firebaseSyncInitialized) {
           try {
             const val = snap.val() || {};
             window.coisas1 = val;
-            // Backwards-compat: também expose como `coisas` e salve em localStorage 'coisas'
             try { window.coisas = val; } catch (e) {}
             try { localStorage.setItem('coisas1', JSON.stringify(val)); } catch (e) { console.warn('Falha ao gravar localStorage coisas1:', e); }
             try { localStorage.setItem('coisas', JSON.stringify(val)); } catch (e) { /* ignore */ }
@@ -118,24 +116,22 @@ if (window.__firebaseSyncInitialized) {
           if (!codigoObj) throw new Error('codigoObj é obrigatório');
 
           const contadorRef = dbRef('contadorGlobal');
-
-            const snapAtual = await get(contadorRef);
-            const valorAtual = snapAtual.exists() ? snapAtual.val() : 0;
+          const snapAtual = await get(contadorRef);
+          const valorAtual = snapAtual.exists() ? snapAtual.val() : 0;
           const limite = 6;
-          if (valorAtual >= limite) {
-              throw new Error(`Limite de ${limite} códigos atingido!`);
-          }
-            // Incrementa o contador no servidor de forma atômica (primeiro código será 0001)
-            let codigoNum = await runTransaction(contadorRef, (currentValue) => {
-              return (currentValue || 0) + 1;
-            }).then(result => result.snapshot.val());
           
+          if (valorAtual >= limite) {
+            throw new Error(`Limite de ${limite} códigos atingido!`);
+          }
+          
+          let codigoNum = await runTransaction(contadorRef, (currentValue) => {
+            return (currentValue || 0) + 1;
+          }).then(result => result.snapshot.val());
 
           const codigoStr = codigoNum.toString().padStart(4, '0');
-
-          // Por padrão, a etapa inicial deve ser 0 (tacto inicia em 0)
           const etapaInicial = (codigoObj && codigoObj.etapa !== undefined) ? codigoObj.etapa : 0;
           const etapasTotal = (codigoObj.etapasTotal || window.DEFAULT_ETAPAS || 6);
+          
           const payload = {
             nome: codigoObj.nome || null,
             etapa: etapaInicial,
@@ -162,13 +158,14 @@ if (window.__firebaseSyncInitialized) {
           const etapasTotal = (current && current.etapasTotal) ? current.etapasTotal : (window.DEFAULT_ETAPAS || 6);
           const hasRetrabalho = (current && current.retrabalho) ? current.retrabalho : false;
 
+          // Calcula tempo baseado na etapa
           const novoTempo = computeTempoSeconds(etapasTotal, etapa, hasRetrabalho);
 
           await update(dbRef(`codigos/${codigo}`), { etapa, tempo: novoTempo, lastUpdatedAt: Date.now() });
           await set(dbRef(`coisas1/${codigo}`), etapa);
           await set(dbRef(`tempos/${codigo}`), novoTempo);
           
-          console.log(`Etapa atualizada para ${etapa}. Tempo: ${novoTempo}s (Retrabalho: ${hasRetrabalho})`);
+          console.log(`Etapa atualizada para ${etapa}. Tempo restante: ${novoTempo}s (Retrabalho: ${hasRetrabalho})`);
         };
       }
 
@@ -186,6 +183,7 @@ if (window.__firebaseSyncInitialized) {
           const etapasTotal = current.etapasTotal || (window.DEFAULT_ETAPAS || 6);
           const etapaAtual = (current && current.etapa !== undefined && current.etapa !== null) ? current.etapa : 0;
           
+          // Recalcula tempo baseado na etapa
           const novoTempo = computeTempoSeconds(etapasTotal, etapaAtual, hasRetrabalho);
           
           await update(dbRef(`codigos/${codigo}`), { 
@@ -211,11 +209,9 @@ if (window.__firebaseSyncInitialized) {
 
       if (!window.resetCodigos) {
         window.resetCodigos = async function () {
-          // Remove códigos e tempos, inicializa coisas1 vazio e contadorGlobal como 0
           await set(dbRef('codigos'), null);
           await set(dbRef('coisas1'), {});
           await set(dbRef('tempos'), null);
-          // Define contadorGlobal como 0 — admin deve alterar quando quiser avançar
           await set(dbRef('contadorGlobal'), 0);
         };
       }
@@ -252,7 +248,8 @@ if (window.__firebaseSyncInitialized) {
       }
 
       window.__firebaseSyncInitialized = true;
-      console.log('firebase-sync initialized: 6 etapas, tempos em SEGUNDOS [0,35,48,40,15,20,15,12]');
+      console.log('✅ firebase-sync initialized: 6 etapas, tempos em SEGUNDOS baseados em etapas RESTANTES');
+      console.log('📊 Tempos por etapa: [0s, 35s, 48s, 40s, 15s, 35s, 12s]');
 
     } catch (e) {
       console.warn('firebase-sync internal error:', e);

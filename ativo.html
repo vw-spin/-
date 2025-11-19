@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Ativo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/pgadmin.css">
+    <style>
+        .btn-retrabalho {
+            background-color: #ff9800;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-retrabalho:hover {
+            background-color: #f57c00;
+            transform: scale(1.05);
+        }
+
+        .btn-retrabalho.ativo {
+            background-color: #4CAF50;
+        }
+
+        .btn-retrabalho.ativo:hover {
+            background-color: #45a049;
+        }
+
+        .status-retrabalho {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-retrabalho.ativo {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+
+        .status-retrabalho.inativo {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+    </style>
+</head>
+
+<header>
+    <div class="container header-content">
+        <img src="img/logo.png" alt="Logo Redim" class="logo">
+        <div>
+            <h3>VW - SPIN 2AP</h3>
+        </div>
+    </div>
+</header>
+
+<body>
+    <div id="quadrado">
+        <div id="nome">
+            <h2>Página de Admin - <span class="vermelho">Matheus D. B. Ativo</span></h2> </br>
+        </div>
+
+        <div class="btn-centro">
+            <div class="btn" id="Ativo" onclick="TactoAtivo()"><a><button type="submit">Atualizar</button></a></div>
+        </div>
+
+        <div id="roleta-container" style="margin: 20px 0; text-align: center;">
+            <h3>Selecionar Código:</h3>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+                <button onclick="roletaAnterior()"
+                    style="padding: 10px 20px; font-size: 18px; cursor: pointer;">◀</button>
+                <div id="roleta-display"
+                    style="font-size: 24px; font-weight: bold; min-width: 100px; padding: 10px; border: 2px solid #333; border-radius: 5px;">
+                    0001</div>
+                <button onclick="roletaProximo()"
+                    style="padding: 10px 20px; font-size: 18px; cursor: pointer;">▶</button>
+            </div>
+            <p id="roleta-info" style="margin-top: 10px; color: #666;">Código selecionado: 0001</p>
+        </div>
+
+        <!-- Botão de Retrabalho -->
+        <div class="btn-centro" style="margin-top: 20px;">
+            <button class="btn-retrabalho" id="btnRetrabalho" onclick="toggleRetrabalho()">
+                ⚠️ Ativar Retrabalho
+            </button>
+        </div>
+
+        <!-- Status do Retrabalho -->
+        <div id="statusRetrabalho" class="status-retrabalho inativo" style="display: none;">
+            Status: Normal
+        </div>
+
+    </div>
+    <div>
+        <div id="codigos-container" class="margin">
+
+        </div>
+    </div>
+    </div>
+
+    <script type="module" src="FireBase/firebase-sync.js"></script>
+    <script src="js/codigos.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/rastreamento.js"></script>
+
+    <script>
+        // Variável para controlar o estado do retrabalho
+        let retrabalhoAtivo = false;
+
+        // Função para alternar o retrabalho
+        async function toggleRetrabalho() {
+            const codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+            
+            if (codigos.length === 0) {
+                alert("Nenhum código encontrado!");
+                return;
+            }
+            
+            const codigoStr = String(roletaAtual).padStart(4, '0');
+            
+            // Verifica se o código existe
+            if (!codeExists(codigoStr)) {
+                alert("Código não encontrado!");
+                return;
+            }
+
+            // Alterna o estado do retrabalho
+            retrabalhoAtivo = !retrabalhoAtivo;
+            
+            const btn = document.getElementById('btnRetrabalho');
+            const status = document.getElementById('statusRetrabalho');
+            
+            if (retrabalhoAtivo) {
+                btn.classList.add('ativo');
+                btn.innerHTML = '✅ Retrabalho Ativo';
+                status.classList.remove('inativo');
+                status.classList.add('ativo');
+                status.innerHTML = '⚠️ Status: RETRABALHO ATIVO';
+                status.style.display = 'block';
+                
+                console.log(`Retrabalho ATIVADO para código ${codigoStr}`);
+            } else {
+                btn.classList.remove('ativo');
+                btn.innerHTML = '⚠️ Ativar Retrabalho';
+                status.classList.remove('ativo');
+                status.classList.add('inativo');
+                status.innerHTML = '✓ Status: Normal';
+                status.style.display = 'block';
+                
+                console.log(`Retrabalho DESATIVADO para código ${codigoStr}`);
+            }
+
+            // Atualiza no Firebase
+            try {
+                if (window.updateCodigoRetrabalho && typeof window.updateCodigoRetrabalho === 'function') {
+                    await window.updateCodigoRetrabalho(codigoStr, retrabalhoAtivo);
+                    console.log(`Retrabalho ${retrabalhoAtivo ? 'ATIVADO' : 'DESATIVADO'} no Firebase`);
+                }
+            } catch (error) {
+                console.error("Erro ao atualizar retrabalho:", error);
+                alert("Erro ao atualizar retrabalho no sistema!");
+            }
+        }
+
+        // Atualiza o status visual quando muda de código
+        function atualizarStatusVisual() {
+            const codigoStr = String(roletaAtual).padStart(4, '0');
+            
+            // Verifica se o código tem retrabalho ativo
+            if (window.codigosMap && window.codigosMap[codigoStr]) {
+                const hasRetrabalho = window.codigosMap[codigoStr].retrabalho || false;
+                retrabalhoAtivo = hasRetrabalho;
+                
+                const btn = document.getElementById('btnRetrabalho');
+                const status = document.getElementById('statusRetrabalho');
+                
+                if (hasRetrabalho) {
+                    btn.classList.add('ativo');
+                    btn.innerHTML = '✅ Retrabalho Ativo';
+                    status.classList.remove('inativo');
+                    status.classList.add('ativo');
+                    status.innerHTML = '⚠️ Status: RETRABALHO ATIVO';
+                    status.style.display = 'block';
+                } else {
+                    btn.classList.remove('ativo');
+                    btn.innerHTML = '⚠️ Ativar Retrabalho';
+                    status.classList.remove('ativo');
+                    status.classList.add('inativo');
+                    status.innerHTML = '✓ Status: Normal';
+                    status.style.display = 'block';
+                }
+            }
+        }
+
+        // Monitora mudanças na roleta
+        const originalRoletaProximo = window.roletaProximo;
+        const originalRoletaAnterior = window.roletaAnterior;
+
+        window.roletaProximo = function() {
+            if (originalRoletaProximo) originalRoletaProximo();
+            atualizarStatusVisual();
+        };
+
+        window.roletaAnterior = function() {
+            if (originalRoletaAnterior) originalRoletaAnterior();
+            atualizarStatusVisual();
+        };
+
+        // Atualiza status inicial
+        window.addEventListener('load', function() {
+            setTimeout(atualizarStatusVisual, 500);
+        });
+    </script>
+
+    <br><br>
+
+    <footer>
+        <p>&copy; 2025 Redim. Todos os direitos reservados a Matheus Ativo e Maki Yoshitake.</p>
+    </footer>
+</body>
+
+</html>

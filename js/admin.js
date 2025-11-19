@@ -1,4 +1,280 @@
-// Admin UI - controle de etapas e criação de códigos
+//Admin de cada pessoa - VERSÃO CONSOLIDADA
+
+// Variável global da roleta (compartilhada por todos)
+var roletaAtual = 1;
+
+// Atualiza o display da roleta (função única)
+function atualizarRoleta() {
+    const display = document.getElementById('roleta-display');
+    const info = document.getElementById('roleta-info');
+    const codigoStr = String(roletaAtual).padStart(4, '0');
+    
+    if (display) display.textContent = codigoStr;
+    if (info) info.textContent = `Código selecionado: ${codigoStr}`;
+}
+
+// Avança para o próximo código (função única)
+function roletaProximo() {
+    const codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+    const totalCodigos = codigos.length;
+    
+    if (totalCodigos === 0) {
+        return;
+    }
+    
+    if (roletaAtual < totalCodigos) {
+        roletaAtual++;
+    } else {
+        roletaAtual = 1; // Volta para o primeiro
+    }
+    
+    atualizarRoleta();
+}
+
+// Volta para o código anterior (função única)
+function roletaAnterior() {
+    const codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+    const totalCodigos = codigos.length;
+    
+    if (totalCodigos === 0) {
+        return;
+    }
+    
+    if (roletaAtual > 1) {
+        roletaAtual--;
+    } else {
+        roletaAtual = totalCodigos; // Vai para o último
+    }
+    
+    atualizarRoleta();
+}
+
+// ========== FUNÇÕES DE ATUALIZAÇÃO POR COLABORADOR ==========
+
+// Maria - Etapa 1
+async function TactoMaria() {
+    console.log("oi maria");
+    
+    const codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+    
+    if (codigos.length === 0) {
+        return;
+    }
+    
+    const codigoStr = String(roletaAtual).padStart(4, '0');
+    
+    if (!codeExists(codigoStr)) {
+        return;
+    }
+    
+    try {
+        if (window.updateCodigoEtapa && typeof window.updateCodigoEtapa === 'function') {
+            await window.updateCodigoEtapa(codigoStr, 1);
+            console.log(`Código ${codigoStr} atualizado para etapa 1 (Firebase)`);
+        }
+        
+        const coisas = JSON.parse(localStorage.getItem('coisas1')) || {};
+        coisas[codigoStr] = 1;
+        localStorage.setItem('coisas1', JSON.stringify(coisas));
+        
+        if (window.coisas1 && typeof window.coisas1 === 'object') {
+            window.coisas1[codigoStr] = 1;
+        }
+        
+        console.log(`Código ${codigoStr} atualizado para etapa 1`);
+        
+    } catch (error) {
+        console.error("Erro ao atualizar código:", error);
+    }
+}
+
+// Villa - Etapa 2
+async function TactoVilla() {
+    console.log("oi villa");
+    
+    const codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+    
+    if (codigos.length === 0) {
+        return;
+    }
+    
+    const codigoStr = String(roletaAtual).padStart(4, '0');
+    
+    if (!codeExists(codigoStr)) {
+        return;
+    }
+    
+    try {
+        if (window.updateCodigoEtapa && typeof window.updateCodigoEtapa === 'function') {
+            await window.updateCodigoEtapa(codigoStr, 2);
+            console.log(`Código ${codigoStr} atualizado para etapa 2 (Firebase)`);
+        }
+        
+        const coisas = JSON.parse(localStorage.getItem('coisas1')) || {};
+        coisas[codigoStr] = 2;
+        localStorage.setItem('coisas1', JSON.stringify(coisas));
+        
+        if (window.coisas1 && typeof window.coisas1 === 'object') {
+            window.coisas1[codigoStr] = 2;
+        }
+        
+        console.log(`Código ${codigoStr} atualizado para etapa 2`);
+        
+    } catch (error) {
+        console.error("Erro ao atualizar código:", error);
+    }
+}
+
+// Maki - Etapa 3
+async function TactoMaki() {
+    console.log("oi maki");
+    
+    const codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+    
+    if (codigos.length === 0) {
+        return;
+    }
+    
+    const codigoStr = String(roletaAtual).padStart(4, '0');
+    
+    if (!codeExists(codigoStr)) {
+        return;
+    }
+    
+    try {
+        if (window.updateCodigoEtapa && typeof window.updateCodigoEtapa === 'function') {
+            await window.updateCodigoEtapa(codigoStr, 3);
+            console.log(`Código ${codigoStr} atualizado para etapa 3 (Firebase)`);
+        }
+        
+        const coisas = JSON.parse(localStorage.getItem('coisas1')) || {};
+        coisas[codigoStr] = 3;
+        localStorage.setItem('coisas1', JSON.stringify(coisas));
+        
+        if (window.coisas1 && typeof window.coisas1 === 'object') {
+            window.coisas1[codigoStr] = 3;
+        }
+        
+        console.log(`Código ${codigoStr} atualizado para etapa 3`);
+        
+    } catch (error) {
+        console.error("Erro ao atualizar código:", error);
+    }
+}
+
+// Ativo - Etapa 4
+async function TactoAtivo() {
+    console.log("oi ativo");
+    
+    const codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+    
+    if (codigos.length === 0) {
+        return;
+    }
+    
+    const codigoStr = String(roletaAtual).padStart(4, '0');
+    
+    if (!codeExists(codigoStr)) {
+        return;
+    }
+    
+    try {
+        if (window.updateCodigoEtapa && typeof window.updateCodigoEtapa === 'function') {
+            await window.updateCodigoEtapa(codigoStr, 4);
+            console.log(`Código ${codigoStr} atualizado para etapa 4 (Firebase)`);
+        }
+        
+        const coisas = JSON.parse(localStorage.getItem('coisas1')) || {};
+        coisas[codigoStr] = 4;
+        localStorage.setItem('coisas1', JSON.stringify(coisas));
+        
+        if (window.coisas1 && typeof window.coisas1 === 'object') {
+            window.coisas1[codigoStr] = 4;
+        }
+        
+        console.log(`Código ${codigoStr} atualizado para etapa 4`);
+        
+    } catch (error) {
+        console.error("Erro ao atualizar código:", error);
+    }
+}
+
+// Rafael - Etapa 5
+async function TactoRafael() {
+    console.log("oi rafael");
+    
+    const codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+    
+    if (codigos.length === 0) {
+        return;
+    }
+    
+    const codigoStr = String(roletaAtual).padStart(4, '0');
+    
+    if (!codeExists(codigoStr)) {
+        return;
+    }
+    
+    try {
+        if (window.updateCodigoEtapa && typeof window.updateCodigoEtapa === 'function') {
+            await window.updateCodigoEtapa(codigoStr, 5);
+            console.log(`Código ${codigoStr} atualizado para etapa 5 (Firebase)`);
+        }
+        
+        const coisas = JSON.parse(localStorage.getItem('coisas1')) || {};
+        coisas[codigoStr] = 5;
+        localStorage.setItem('coisas1', JSON.stringify(coisas));
+        
+        if (window.coisas1 && typeof window.coisas1 === 'object') {
+            window.coisas1[codigoStr] = 5;
+        }
+        
+        console.log(`Código ${codigoStr} atualizado para etapa 5`);
+        
+    } catch (error) {
+        console.error("Erro ao atualizar código:", error);
+    }
+}
+
+// Murilo - Etapa 6
+async function TactoMurilo() {
+    console.log("oi murilo");
+    
+    const codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+    
+    if (codigos.length === 0) {
+        return;
+    }
+    
+    const codigoStr = String(roletaAtual).padStart(4, '0');
+    
+    if (!codeExists(codigoStr)) {
+        return;
+    }
+    
+    try {
+        if (window.updateCodigoEtapa && typeof window.updateCodigoEtapa === 'function') {
+            await window.updateCodigoEtapa(codigoStr, 6);
+            console.log(`Código ${codigoStr} FINALIZADO para etapa 6 (Firebase)`);
+        }
+        
+        const coisas = JSON.parse(localStorage.getItem('coisas1')) || {};
+        coisas[codigoStr] = 6;
+        localStorage.setItem('coisas1', JSON.stringify(coisas));
+        
+        if (window.coisas1 && typeof window.coisas1 === 'object') {
+            window.coisas1[codigoStr] = 6;
+        }
+        
+        console.log(`Código ${codigoStr} FINALIZADO - etapa 6`);
+        
+    } catch (error) {
+        console.error("Erro ao atualizar código:", error);
+    }
+}
+
+// ========== FUNÇÕES ADMINISTRATIVAS ==========
+
 var etapa1 = 1;
 var B1 = document.getElementById('b1');
 var B2 = document.getElementById('b2');
@@ -11,39 +287,34 @@ var B8 = document.getElementById('b8');
 var B9 = document.getElementById('b9');
 var EtapasAdmin1 = document.getElementById('EtapasAdmin');
 
-// Define que o sistema tem 6 etapas
 window.DEFAULT_ETAPAS = 6;
 
 var QetapaÉ = '';
 var conta = parseInt(localStorage.getItem("contador")) || 0;
 
-retrabalho = 0; // etapa destinada ao retrabalho 
-corB = 0; // define a cor do botão
+retrabalho = 0;
+corB = 0;
 
 function getCoisas1() {
     return (window.coisas1 && typeof window.coisas1 === 'object') ? window.coisas1 : (JSON.parse(localStorage.getItem("coisas1")) || []);
 }
 
-// Verifica se um código já existe
 function codeExists(codigoStr) {
     try {
         if (window.codigosMap && window.codigosMap[codigoStr]) return true;
         var localCodigos = JSON.parse(localStorage.getItem('codigos')) || [];
         if (Array.isArray(localCodigos) && localCodigos.find(c => c.codigo === codigoStr)) return true;
-    } catch (e) { /* ignore parse errors */ }
+    } catch (e) { }
     return false;
 }
 
 var etapa = 1;
 var sequenciamento;
 
-// Inicializa estado visual: primeiro círculo amarelo por padrão
 try {
     resetador();
     if (B1) B1.style.backgroundColor = 'yellow';
-} catch (e) { 
-    
- }
+} catch (e) { }
 
 function b1() {
     etapa1 = 1;
@@ -137,7 +408,6 @@ function b6() {
 }
 
 function b7() {
-    // botão de finalizar
     etapa1 = 6;
     B1.style.backgroundColor = 'green';
     B2.style.backgroundColor = 'green';
@@ -164,7 +434,6 @@ async function b9() {
     const codigoStr = String(codigoTrim).padStart(4, '0');
     const codigoNum = parseInt(codigoTrim, 10);
 
-    // exige que o código exista antes de permitir mudar a etapa
     if (!codeExists(codigoStr)) {
         const EtapasAdmin1 = document.getElementById('EtapasAdmin');
         if (EtapasAdmin1) EtapasAdmin1.innerHTML = `<strong>Código não encontrado. Crie o código antes de alterar a etapa.</strong>`;
@@ -172,13 +441,11 @@ async function b9() {
         return;
     }
 
-    // atualiza etapa localmente e no Firebase quando possível
     try {
         if (window.updateCodigoEtapa && typeof window.updateCodigoEtapa === 'function') {
             try {
                 await window.updateCodigoEtapa(codigoStr, etapa1);
                 
-                // Atualiza o status de retrabalho no Firebase
                 if (window.updateCodigoRetrabalho && typeof window.updateCodigoRetrabalho === 'function') {
                     await window.updateCodigoRetrabalho(codigoStr, retrabalho === 1);
                     console.log(`Retrabalho ${retrabalho === 1 ? 'ATIVADO' : 'DESATIVADO'} para código ${codigoStr}`);
@@ -220,7 +487,6 @@ function b10() {
     (async () => {
         try {
             if (window.addCodigo && typeof window.addCodigo === 'function') {
-                // etapa inicia em 0 (tacto = 0)
                 const payload = { nome, etapa: 0, createdAt: Date.now() };
                 const generated = await window.addCodigo(payload);
                 const codigoStr = String(generated).padStart(4, '0');
@@ -318,7 +584,6 @@ function b11() {
             break;
     }
 
-    // Verifica se há retrabalho ativo
     let hasRetrabalho = false;
     if (window.codigosMap && window.codigosMap[codigoStr]) {
         hasRetrabalho = window.codigosMap[codigoStr].retrabalho || false;

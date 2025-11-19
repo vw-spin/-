@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Villa</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/pgadmin.css">
+</head>
+
+<header>
+    <div class="container header-content">
+        <img src="img/logo.png" alt="Logo Redim" class="logo">
+        <div>
+            <h3>VW - SPIN 2AP</h3>
+        </div>
+    </div>
+</header>
+
+<body>
+    <div id="quadrado">
+        <div id="nome">
+            <h2>Página de Admin - <span class="vermelho">Matheus Gabriel M. Villa</span></h2> </br>
+        </div>
+
+        <div class="btn-centro">
+            <div class="btn" id="Villa" onclick="TactoVilla()"><a><button type="submit">Atualizar</button></a></div>
+        </div>
+
+        <div id="roleta-container" style="margin: 20px 0; text-align: center;">
+            <h3>Selecionar Código:</h3>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+                <button onclick="roletaAnterior()"
+                    style="padding: 10px 20px; font-size: 18px; cursor: pointer;">◀</button>
+                <div id="roleta-display"
+                    style="font-size: 24px; font-weight: bold; min-width: 100px; padding: 10px; border: 2px solid #333; border-radius: 5px;">
+                    0001</div>
+                <button onclick="roletaProximo()"
+                    style="padding: 10px 20px; font-size: 18px; cursor: pointer;">▶</button>
+            </div>
+            <p id="roleta-info" style="margin-top: 10px; color: #666;">Código selecionado: 0001</p>
+        </div>
+    </div>
+
+    <div>
+        <div id="codigos-container" class="margin">
+
+        </div>
+    </div>
+
+    </div>
+
+    <br><br>
+
+      <script type="module" src="FireBase/firebase-sync.js"></script>
+    <script src="js/codigos.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/rastreamento.js"></script>
+
+    <footer>
+        <p>&copy; 2025 Redim. Todos os direitos reservados a Matheus Ativo e Maki Yoshitake.</p>
+    </footer>
+</body>
+
+</html>

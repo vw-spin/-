@@ -51,7 +51,7 @@ function atualizadorNomeCodigos() {
                         case 2: nomeEtapa = 'Montagem dos meios'; break;
                         case 3: nomeEtapa = 'Montagem das quinas'; break;
                         case 4: nomeEtapa = 'Testes de qualidade'; break;
-                        case 5: nomeEtapa = 'Montagem das tampas'; break;
+                        case 5: nomeEtapa = 'Ajuste dos parafusos e montagem das tampas em andamento'; break;
                         case 6: nomeEtapa = 'Colocação do produto na embalagem'; break;
                         default: nomeEtapa = 'Etapa desconhecida';
                     }
