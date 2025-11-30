@@ -9,7 +9,6 @@ var currentDisplayedCodigo = '';
 window.DEFAULT_ETAPAS = 6;
 
 // Tempos ajustados conforme a tabela (ordem: 35+48+40+15+35+12 = 185s total)
-// Índice 0 = inicial, 1-6 = etapas 1-6
 if (!window.SECS_PER_STAGE) {
   window.SECS_PER_STAGE = [0, 35, 48, 40, 15, 35, 12];
 }

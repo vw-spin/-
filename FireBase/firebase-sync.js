@@ -7,16 +7,15 @@ if (window.__firebaseSyncInitialized) {
       const dbModule = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js');
       const { getDatabase, ref, onValue, set, update, get, remove, runTransaction } = dbModule;
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyA1To6Eyx1iNvUIiST2LulmXWzDVl252w4",
-        authDomain: "teste-004-c3dcf.firebaseapp.com",
-        databaseURL: "https://teste-004-c3dcf-default-rtdb.firebaseio.com",
-        projectId: "teste-004-c3dcf",
-        storageBucket: "teste-004-c3dcf.firebasestorage.app",
-        messagingSenderId: "829672601958",
-        appId: "1:829672601958:web:ff6cbd97f45a4d50eff0a7",
-        measurementId: "G-DXBRNTD5LT"
-      };
+const firebaseConfig = {
+  apiKey: "AIzaSyBd173EgkgAWWVNgN4j2_U-fU1ZLKQrgIM",
+  authDomain: "teste-ee3b5.firebaseapp.com",
+  databaseURL: "https://teste-ee3b5-default-rtdb.firebaseio.com",
+  projectId: "teste-ee3b5",
+  storageBucket: "teste-ee3b5.firebasestorage.app",
+  messagingSenderId: "84095674556",
+  appId: "1:84095674556:web:eadf7db8ab4ee9521448b9"
+};
 
       const app = initializeApp(firebaseConfig);
       const db = getDatabase(app);
